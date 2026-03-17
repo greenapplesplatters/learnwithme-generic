@@ -1,0 +1,13 @@
+# topics.txt — one topic per line, # lines are ignored
+# Edit this file to control what study cards get generated.
+# Then push to trigger a new Vercel deploy.
+#
+# Example (AP Biology):
+#   Cell Structure & Function
+#   DNA Replication & Repair
+#   Protein Synthesis
+#   Cellular Respiration
+#   Photosynthesis
+#   Genetics & Heredity
+#   Evolution & Natural Selection
+#   Ecology & Ecosystems
