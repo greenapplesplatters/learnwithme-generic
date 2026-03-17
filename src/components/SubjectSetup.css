@@ -1,10 +1,12 @@
 .setup-container {
+  width: 100%;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(ellipse at top, #0d0a1f 0%, #020617 60%);
   padding: 1.5rem;
+  box-sizing: border-box;
 }
 
 .setup-card {
@@ -56,11 +58,12 @@
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
   color: #f1f5f9;
-  font-size: 0.9rem;
+  font-size: 1rem; /* 16px min prevents iOS auto-zoom on focus */
   padding: 0.7rem 1rem;
   outline: none;
   transition: border-color 0.15s ease;
   box-sizing: border-box;
+  -webkit-appearance: none;
 }
 
 .setup-input:focus {
@@ -85,10 +88,12 @@
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
-  padding: 0.85rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   cursor: pointer;
   transition: opacity 0.15s ease, transform 0.15s ease;
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
+  touch-action: manipulation;
+  min-height: 48px; /* comfortable tap target */
 }
 
 .btn-generate:hover:not(:disabled) {
@@ -115,11 +120,13 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   color: #64748b;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.35rem 0.85rem;
+  padding: 0.45rem 0.9rem;
   cursor: pointer;
   transition: all 0.15s ease;
+  touch-action: manipulation;
+  min-height: 36px;
 }
 
 .topic-chip:hover {
@@ -151,10 +158,12 @@
   color: #a78bfa;
   font-size: 1.2rem;
   font-weight: 700;
-  width: 42px;
+  width: 48px;
+  min-height: 48px;
   flex-shrink: 0;
   cursor: pointer;
   transition: background 0.15s ease;
+  touch-action: manipulation;
 }
 
 .btn-add-topic:hover {
@@ -224,4 +233,16 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Small screens ── */
+@media (max-width: 480px) {
+  .setup-card {
+    padding: 2rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .setup-card--wide {
+    max-width: 100%;
+  }
 }
