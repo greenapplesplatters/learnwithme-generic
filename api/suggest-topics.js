@@ -33,8 +33,18 @@ async function callGemini(apiKey, prompt, maxTokens, temperature) {
     }),
   });
   const json = await res.json();
-  const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error('Empty response from Gemini');
+
+  if (json.error) {
+    throw new Error(`Gemini API error ${json.error.code}: ${json.error.message}`);
+  }
+
+  if (!json.candidates?.length) {
+    const reason = json.promptFeedback?.blockReason || 'unknown';
+    throw new Error(`Gemini returned no candidates (blockReason: ${reason})`);
+  }
+
+  const text = json.candidates[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Gemini candidate had no text content');
   return text;
 }
 
