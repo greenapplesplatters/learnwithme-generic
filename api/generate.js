@@ -67,7 +67,7 @@ export default async function handler(req, res) {
 }
 
 async function callGemini(apiKey, prompt) {
-  const model = 'gemini-3.0-flash';
+  const model = 'gemini-3-flash-preview';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
