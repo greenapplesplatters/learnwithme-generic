@@ -14,8 +14,8 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
 
   try {
-    const data = await callGemini(apiKey, PROMPT(subject.trim()), 512, 0.3);
-    const topics = JSON.parse(stripFences(data));
+    const data = await callGemini(apiKey, PROMPT(subject.trim()), 1024, 0.3);
+    const topics = JSON.parse(extractJson(data, '[', ']'));
     return res.status(200).json({ topics });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -48,6 +48,10 @@ async function callGemini(apiKey, prompt, maxTokens, temperature) {
   return text;
 }
 
-function stripFences(text) {
+function extractJson(text, open, close) {
+  const start = text.indexOf(open);
+  const end   = text.lastIndexOf(close);
+  if (start !== -1 && end > start) return text.slice(start, end + 1);
+  // fallback: strip fences and return as-is
   return text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
 }
