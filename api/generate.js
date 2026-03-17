@@ -51,7 +51,7 @@ export default async function handler(req, res) {
 
   try {
     const raw = await callGemini(apiKey, PROMPT(subject.trim(), topic.trim(), cardsPerTopic));
-    const cards = JSON.parse(stripFences(raw));
+    const cards = JSON.parse(extractJson(raw));
 
     const slug = topic.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const processed = cards.map((card, i) => ({
@@ -95,6 +95,9 @@ async function callGemini(apiKey, prompt) {
   return text;
 }
 
-function stripFences(text) {
+function extractJson(text) {
+  const start = text.indexOf('[');
+  const end   = text.lastIndexOf(']');
+  if (start !== -1 && end > start) return text.slice(start, end + 1);
   return text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
 }
