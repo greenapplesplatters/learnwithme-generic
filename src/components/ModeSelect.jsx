@@ -22,7 +22,7 @@ const ModeSelect = ({ onSelect, subject, onChangeSubject }) => {
 
         <button className="mode-card study-card-btn" onClick={() => onSelect('study')}>
           <span className="mode-icon">📚</span>
-          <h2>Study Mode</h2>
+          <h2>Test Mode</h2>
           <p>Adaptive cards ranked by your weakest topics. Tracks mastery over time.</p>
           <span className="mode-cta">Start Studying →</span>
         </button>

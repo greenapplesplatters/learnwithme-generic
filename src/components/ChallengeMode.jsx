@@ -64,7 +64,7 @@ const GameOver = ({ score, result, onRestart, onExit }) => {
 
         <div className="gameover-actions">
           <button className="btn-restart" onClick={onRestart}>Play Again</button>
-          <button className="btn-exit" onClick={onExit}>Study Mode</button>
+          <button className="btn-exit" onClick={onExit}>Test Mode</button>
         </div>
 
       </div>
