@@ -14,7 +14,6 @@
 .study-card {
   width: 100%;
   max-width: 450px;
-  height: 85vh;
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(22, 10, 50, 0.88));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
