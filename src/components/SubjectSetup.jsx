@@ -79,8 +79,12 @@ const SubjectSetup = ({ onComplete }) => {
         body: JSON.stringify({ subject: subjectName.trim(), topics: topicList }),
       });
       const data = await res.json();
+      console.log('Lessons API response:', res.status, data);
       if (data.lessons) allLessons = data.lessons;
-    } catch { /* lessons are optional — fall back to default */ }
+      if (data.error) console.error('Lessons API error:', data.error);
+    } catch (err) {
+      console.error('Lessons API fetch failed:', err.message);
+    }
 
     onComplete(subjectName.trim(), allCards, allLessons);
   };
