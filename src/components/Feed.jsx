@@ -1,9 +1,18 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import StudyCard from './StudyCard.jsx';
 import ProgressHUD from './ProgressHUD.jsx';
 import { buildAdaptiveFeed, getWeakTopics } from '../utils/adaptiveFeed.js';
 import { recordAnswer, recordView } from '../utils/mastery.js';
 import './Feed.css';
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 const Feed = ({ onExit, cards }) => {
   const [feed, setFeed] = useState([]);
@@ -15,19 +24,37 @@ const Feed = ({ onExit, cards }) => {
   const [sessionAnswered, setSessionAnswered] = useState(0);
   const [sessionStreak, setSessionStreak]     = useState(0);
 
+  // Topic filter + shuffle state
+  const [activeTopic, setActiveTopic] = useState('All');
+  const [shuffled, setShuffled] = useState(false);
+
   // Build the adaptive feed once on mount (order is based on stored mastery)
   useEffect(() => {
     setFeed(buildAdaptiveFeed(cards));
   }, [cards]);
 
+  // Derive unique topics from feed
+  const topics = useMemo(() => {
+    const seen = new Set();
+    feed.forEach(c => c.topic && seen.add(c.topic));
+    return ['All', ...Array.from(seen)];
+  }, [feed]);
+
+  // Apply topic filter + optional shuffle
+  const visibleFeed = useMemo(() => {
+    let f = activeTopic === 'All' ? feed : feed.filter(c => c.topic === activeTopic);
+    if (shuffled) f = shuffleArr(f);
+    return f;
+  }, [feed, activeTopic, shuffled]);
+
   // Scroll detection
   const handleScroll = useCallback(() => {
     if (!feedRef.current) return;
     const idx = Math.round(feedRef.current.scrollTop / window.innerHeight);
-    if (idx !== currentIndex && idx >= 0 && idx <= feed.length) {
+    if (idx !== currentIndex && idx >= 0 && idx <= visibleFeed.length) {
       setCurrentIndex(idx);
     }
-  }, [currentIndex, feed.length]);
+  }, [currentIndex, visibleFeed.length]);
 
   // Called when user picks an option on a quiz/scenario card
   const handleAnswer = useCallback((conceptId, isCorrect, format) => {
@@ -71,8 +98,28 @@ const Feed = ({ onExit, cards }) => {
         streak={sessionStreak}
       />
 
+      {/* Topic filter chip bar */}
+      <div className="feed-chip-bar">
+        {topics.map(t => (
+          <button
+            key={t}
+            className={`feed-chip ${activeTopic === t ? 'feed-chip-active' : ''}`}
+            onClick={() => { setActiveTopic(t); setCurrentIndex(0); feedRef.current?.scrollTo(0, 0); }}
+          >
+            {t}
+          </button>
+        ))}
+        <span className="chip-divider" />
+        <button
+          className={`feed-chip feed-chip-shuffle ${shuffled ? 'feed-chip-active' : ''}`}
+          onClick={() => setShuffled(s => !s)}
+        >
+          🔀 Shuffle
+        </button>
+      </div>
+
       <div className="feed-container" ref={feedRef} onScroll={handleScroll}>
-        {feed.map((card, index) => (
+        {visibleFeed.map((card, index) => (
           <StudyCard
             key={card.concept_id}
             data={card}

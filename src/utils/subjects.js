@@ -6,9 +6,9 @@ export function getSubjects() {
   catch { return {}; }
 }
 
-export function saveSubject(id, name, cards) {
+export function saveSubject(id, name, cards, lessons) {
   const all = getSubjects();
-  all[id] = { id, name, cards, updatedAt: Date.now() };
+  all[id] = { id, name, cards, lessons: lessons || [], updatedAt: Date.now() };
   localStorage.setItem(SUBJECTS_KEY, JSON.stringify(all));
 }
 

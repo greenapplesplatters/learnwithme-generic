@@ -48,7 +48,7 @@ const SubjectSetup = ({ onComplete }) => {
     setCustomTopic('');
   };
 
-  // ── Step 3: generate cards ────────────────────────────────────────────────
+  // ── Step 3: generate cards + lessons ─────────────────────────────────────
   const generate = async () => {
     const topicList = topics.filter(t => selected.has(t));
     if (!topicList.length) return;
@@ -70,7 +70,19 @@ const SubjectSetup = ({ onComplete }) => {
       setProgress(p => ({ ...p, done: p.done + 1 }));
     }
 
-    onComplete(subjectName.trim(), allCards);
+    // Generate sensationalist lesson cards for Study Mode
+    let allLessons = [];
+    try {
+      const res = await fetch('/api/generate-lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: subjectName.trim(), topics: topicList }),
+      });
+      const data = await res.json();
+      if (data.lessons) allLessons = data.lessons;
+    } catch { /* lessons are optional — fall back to default */ }
+
+    onComplete(subjectName.trim(), allCards, allLessons);
   };
 
   // ── Generating screen ──────────────────────────────────────────────────────

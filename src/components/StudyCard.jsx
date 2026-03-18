@@ -1,4 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 import { Heart, Bookmark } from 'lucide-react';
 import './StudyCard.css';
 
@@ -39,9 +48,15 @@ const QuizCard = ({ data, format, onAnswer }) => {
   const [face, setFace] = useState('question'); // 'question' | 'revealed' | 'explanation'
 
   const formatData = data[`${format}_format`] || data.quiz_format;
+  const rawOptions = formatData?.options || [];
+
+  // Shuffle options once per card — stable until concept or format changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const options = useMemo(() => shuffleArr(rawOptions), [data.concept_id, format]);
+
   if (!formatData) return <div className="card-error">No content available.</div>;
 
-  const { question, options = [], explanation } = formatData;
+  const { question, explanation } = formatData;
   const meta = FORMAT_META[format];
 
   const handleSelect = (opt, i) => {

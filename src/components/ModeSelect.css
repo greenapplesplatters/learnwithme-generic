@@ -117,6 +117,20 @@
   margin-top: 0.25rem;
 }
 
+/* Learn (Study) mode */
+.learn-card-btn {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.08);
+}
+
+.learn-card-btn p    { color: #94a3b8; }
+.learn-card-btn .mode-cta { color: #10b981; }
+
+.learn-card-btn:hover {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.2);
+}
+
 /* Study mode */
 .study-card-btn {
   border-color: rgba(124, 58, 237, 0.4);

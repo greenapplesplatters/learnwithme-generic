@@ -77,7 +77,15 @@ const GameOver = ({ score, result, onRestart, onExit }) => {
 const ChallengeMode = ({ onExit, cards }) => {
   const questions = useMemo(() => {
     const masteryData = loadMastery();
-    return shuffle(cards.map(c => resolveVariant(c, masteryData[c.concept_id] || {})));
+    return shuffle(cards.map(c => {
+      const resolved = resolveVariant(c, masteryData[c.concept_id] || {});
+      const shuffleOpts = (fmt) => fmt ? { ...fmt, options: shuffle(fmt.options || []) } : fmt;
+      return {
+        ...resolved,
+        quiz_format:     shuffleOpts(resolved.quiz_format),
+        scenario_format: shuffleOpts(resolved.scenario_format),
+      };
+    }));
   }, [cards]);
 
   const [qIndex, setQIndex]       = useState(0);

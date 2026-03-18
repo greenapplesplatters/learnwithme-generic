@@ -20,6 +20,13 @@ const ModeSelect = ({ onSelect, subject, onChangeSubject }) => {
 
       <div className="mode-cards">
 
+        <button className="mode-card learn-card-btn" onClick={() => onSelect('learn')}>
+          <span className="mode-icon">🧠</span>
+          <h2>Study Mode</h2>
+          <p>Bite-sized lessons with headline hooks. Learn concepts before you test them.</p>
+          <span className="mode-cta">Start Learning →</span>
+        </button>
+
         <button className="mode-card study-card-btn" onClick={() => onSelect('study')}>
           <span className="mode-icon">📚</span>
           <h2>Test Mode</h2>

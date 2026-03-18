@@ -1,0 +1,101 @@
+/* ── Layout ── */
+.study-mode {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #111;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.study-mode-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #111;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.study-mode-exit {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 6px 0;
+  min-width: 60px;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.study-mode-exit:hover {
+  color: #fff;
+}
+
+.study-mode-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.study-mode-count {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.35);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ── Card feed — snap scroll ── */
+.study-mode-feed {
+  flex: 1;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.study-mode-feed::-webkit-scrollbar {
+  display: none;
+}
+
+.study-mode-slot {
+  scroll-snap-align: start;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ── End of feed ── */
+.study-mode-end {
+  scroll-snap-align: start;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: rgba(255,255,255,0.5);
+  font-size: 1rem;
+}
+
+.study-mode-exit-btn {
+  background: #fff;
+  color: #111;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.study-mode-exit-btn:hover {
+  opacity: 0.85;
+}

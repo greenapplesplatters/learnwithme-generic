@@ -110,3 +110,66 @@
   color: #1e293b;
   margin-top: 0.5rem;
 }
+
+/* ─── Topic filter chip bar ─────────────────────────────────────────────────── */
+
+.feed-chip-bar {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(2, 6, 23, 0.85);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  overflow-x: auto;
+  max-width: calc(100vw - 2rem);
+  scrollbar-width: none;
+}
+
+.feed-chip-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-chip {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 999px;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.feed-chip:hover {
+  color: #94a3b8;
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.feed-chip-active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.5);
+  color: #a855f7;
+}
+
+.feed-chip-shuffle.feed-chip-active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #10b981;
+}
+
+.chip-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(100, 116, 139, 0.3);
+  flex-shrink: 0;
+}
