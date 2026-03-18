@@ -126,6 +126,12 @@ const Feed = ({ onExit, cards }) => {
             isActive={index === currentIndex}
             onAnswer={(isCorrect, fmt) => handleAnswer(card.concept_id, isCorrect, fmt)}
             onView={() => handleView(card.concept_id)}
+            onNext={() => {
+              if (index < visibleFeed.length - 1) {
+                setCurrentIndex(index + 1);
+                feedRef.current?.children[index + 1]?.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
           />
         ))}
 

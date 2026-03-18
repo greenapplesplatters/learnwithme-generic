@@ -43,9 +43,11 @@ function getHookLine(format, conceptId) {
 //   'revealed'    — correct/wrong shown on options, no explanation yet
 //   'explanation' — full explanation on the card back
 
-const QuizCard = ({ data, format, onAnswer }) => {
+const QuizCard = ({ data, format, onAnswer, onNext }) => {
   const [selected, setSelected] = useState(null);
   const [face, setFace] = useState('question'); // 'question' | 'revealed' | 'explanation'
+  const [expPage, setExpPage] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
 
   const formatData = data[`${format}_format`] || data.quiz_format;
   const rawOptions = formatData?.options || [];
@@ -59,6 +61,24 @@ const QuizCard = ({ data, format, onAnswer }) => {
   const { question, explanation } = formatData;
   const meta = FORMAT_META[format];
 
+  // Split long explanations into ~400 char pages
+  const expPages = useMemo(() => {
+    if (!explanation) return [];
+    const sentences = explanation.split(/(?<=[.!?])\s+/);
+    const pages = [];
+    let current = '';
+    sentences.forEach(sent => {
+      if ((current + sent).length > 400 && current) {
+        pages.push(current.trim());
+        current = sent;
+      } else {
+        current += (current ? ' ' : '') + sent;
+      }
+    });
+    if (current) pages.push(current.trim());
+    return pages.length > 0 ? pages : [explanation];
+  }, [explanation]);
+
   const handleSelect = (opt, i) => {
     if (face !== 'question') return;
     setSelected(i);
@@ -66,12 +86,47 @@ const QuizCard = ({ data, format, onAnswer }) => {
     onAnswer(opt.correct, format);
   };
 
+  const handleTouchStart = (e) => {
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const deltaX = endX - touchStart.x;
+    const deltaY = endY - touchStart.y;
+
+    // Swipe up (more vertical than horizontal, moving up)
+    if (Math.abs(deltaY) > Math.abs(deltaX) && deltaY < -50) {
+      if (onNext) onNext();
+      return;
+    }
+
+    // Only process horizontal swipe on explanation face
+    if (face !== 'explanation' || Math.abs(deltaX) < 50) {
+      setTouchStart(null);
+      return;
+    }
+
+    // Swipe left (next page)
+    if (deltaX < -50 && expPage < expPages.length - 1) {
+      setExpPage(expPage + 1);
+    }
+    // Swipe right (prev page)
+    else if (deltaX > 50 && expPage > 0) {
+      setExpPage(expPage - 1);
+    }
+
+    setTouchStart(null);
+  };
+
   // ── Explanation face ────────────────────────────────────────────────────────
   if (face === 'explanation') {
     const picked = options[selected];
     const correctIdx = options.findIndex(o => o.correct);
     return (
-      <div className="card-content exp-face">
+      <div className="card-content exp-face" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <button className="exp-back-btn" onClick={() => setFace('revealed')}>← Back</button>
 
         <div className={`exp-verdict ${picked?.correct ? 'verdict-correct' : 'verdict-wrong'}`}>
@@ -91,11 +146,19 @@ const QuizCard = ({ data, format, onAnswer }) => {
         {explanation && (
           <div className="exp-body">
             <p className="exp-label">WHY:</p>
-            <p className="exp-text">{formatText(explanation)}</p>
+            <p className="exp-text">{formatText(expPages[expPage])}</p>
           </div>
         )}
 
-        <p className="exp-scroll-hint">↓ scroll to continue</p>
+        {expPages.length > 1 && (
+          <div className="exp-page-indicator">
+            {expPages.map((_, i) => (
+              <span key={i} className={`exp-dot ${i === expPage ? 'active' : ''}`} />
+            ))}
+          </div>
+        )}
+
+        <p className="exp-scroll-hint">{expPage < expPages.length - 1 ? '→ swipe for more' : '↑ swipe to next'}</p>
       </div>
     );
   }
@@ -169,7 +232,7 @@ const RuleCard = ({ data, onView }) => {
 
 // ─── Root card wrapper ────────────────────────────────────────────────────────
 
-const StudyCard = ({ data, isActive, onAnswer, onView }) => {
+const StudyCard = ({ data, isActive, onAnswer, onView, onNext }) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -190,7 +253,7 @@ const StudyCard = ({ data, isActive, onAnswer, onView }) => {
 
         {format === 'rule'
           ? <RuleCard data={data} onView={onView} />
-          : <QuizCard data={data} format={format} onAnswer={onAnswer} />
+          : <QuizCard data={data} format={format} onAnswer={onAnswer} onNext={onNext} />
         }
 
         <div className="card-actions">
