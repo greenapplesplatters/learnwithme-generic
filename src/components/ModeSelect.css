@@ -1,13 +1,19 @@
 .mode-select {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 2rem 1.5rem;
   gap: 2.5rem;
   background: radial-gradient(ellipse at top, #0d0a1f 0%, #020617 60%);
+  overflow-y: auto;
+}
+
+.mode-select::before,
+.mode-select::after {
+  content: '';
+  flex: 1;
 }
 
 /* ─── Logo ──────────────────────────────────────────────────────────────────── */
