@@ -59,7 +59,7 @@
 .btn-change-subject {
   background: none;
   border: none;
-  color: #334155;
+  color: #64748b;
   font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
@@ -67,7 +67,7 @@
   transition: color 0.15s ease;
 }
 
-.btn-change-subject:hover { color: #64748b; }
+.btn-change-subject:hover { color: #94a3b8; }
 
 /* ─── Cards ─────────────────────────────────────────────────────────────────── */
 
