@@ -49,6 +49,20 @@ const ModeSelect = ({ onSelect, subject, onChangeSubject }) => {
           <span className="mode-cta">Accept Challenge →</span>
         </button>
 
+        <button className="mode-card socratic-card-btn" onClick={() => onSelect('socratic')}>
+          <span className="mode-icon">🏛️</span>
+          <h2>Socratic Mode</h2>
+          <p>Guided dialogue with Socrates. He asks, you think. Real understanding follows.</p>
+          <span className="mode-cta">Begin Dialogue →</span>
+        </button>
+
+        <button className="mode-card quest-card-btn" onClick={() => onSelect('quest')}>
+          <span className="mode-icon">🧙</span>
+          <h2>Quest Mode</h2>
+          <p>Enter the dungeon. Solve challenges, earn XP, level up. Knowledge is your weapon.</p>
+          <span className="mode-cta">Enter Dungeon →</span>
+        </button>
+
       </div>
     </div>
   );

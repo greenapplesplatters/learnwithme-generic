@@ -3,6 +3,8 @@ import ModeSelect from './components/ModeSelect';
 import Feed from './components/Feed';
 import ChallengeMode from './components/ChallengeMode';
 import StudyMode from './components/StudyMode';
+import SocraticMode from './components/SocraticMode';
+import QuestMode from './components/QuestMode';
 import SubjectSetup from './components/SubjectSetup';
 import {
   getActiveSubject,
@@ -13,7 +15,7 @@ import {
 import './index.css';
 
 function App() {
-  const [mode, setMode] = useState(null); // null | 'learn' | 'study' | 'challenge' | 'setup'
+  const [mode, setMode] = useState(null); // null | 'learn' | 'study' | 'challenge' | 'socratic' | 'quest' | 'setup'
   const [activeSubject, setActiveSubject] = useState(() => getActiveSubject());
 
   const handleSubjectComplete = (name, cards, lessons) => {
@@ -46,6 +48,12 @@ function App() {
       )}
       {mode === 'challenge' && (
         <ChallengeMode onExit={() => setMode(null)} cards={activeSubject.cards} />
+      )}
+      {mode === 'socratic' && (
+        <SocraticMode onExit={() => setMode(null)} subject={activeSubject} />
+      )}
+      {mode === 'quest' && (
+        <QuestMode onExit={() => setMode(null)} subject={activeSubject} />
       )}
     </div>
   );
