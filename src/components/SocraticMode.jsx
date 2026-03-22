@@ -29,7 +29,7 @@ function detectInjection(text) {
 
 const MAX_STRIKES = 2;
 const LOCKOUT_KEY = 'socratic_lockout';
-const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+const LOCKOUT_DURATION = 15 * 60 * 1000;
 
 function isLockedOut() {
   try {
@@ -47,7 +47,7 @@ function setLockout() {
 }
 
 const SESSION_PREFIX = 'socratic_session_';
-const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const SESSION_MAX_MESSAGES = 36;
 
 function getSessionKey(t) {
@@ -88,7 +88,6 @@ function hasSession(t) {
   } catch { return false; }
 }
 
-// Generate a color from topic name for dynamic subjects
 function topicColor(name) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -98,9 +97,34 @@ function topicColor(name) {
   return `hsl(${h}, 55%, 50%)`;
 }
 
+const PERSONALITIES = [
+  {
+    id: 'socratic',
+    icon: '🏛️',
+    label: 'Socrates',
+    desc: 'The ancient philosopher. Questions that reveal what you don\'t know.',
+    avatarLabel: 'S',
+  },
+  {
+    id: 'tutor',
+    icon: '👨‍🏫',
+    label: 'Direct Tutor',
+    desc: 'Clear Q&A. Honest feedback. Builds from fundamentals up.',
+    avatarLabel: 'T',
+  },
+  {
+    id: 'gameshow',
+    icon: '🎤',
+    label: 'Game Show',
+    desc: 'High stakes. Dramatic reveals. Prime time energy.',
+    avatarLabel: '★',
+  },
+];
+
 export default function SocraticMode({ onExit, subject }) {
   const ALL_TOPICS = [...new Set((subject?.cards || []).map(c => c.topic))];
 
+  const [personality, setPersonality] = useState(null);
   const [topic, setTopic] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -151,6 +175,7 @@ export default function SocraticMode({ onExit, subject }) {
           subject: subject.name,
           topic: currentTopic,
           history,
+          personality: personality || 'socratic',
         }),
       });
 
@@ -240,7 +265,7 @@ export default function SocraticMode({ onExit, subject }) {
         return;
       }
       const blocked = { role: 'user', content: sanitized };
-      const refusal = { role: 'assistant', content: `That looks like an attempt to change my instructions. I'm your Socratic tutor for ${topic} — nothing else. This is strike ${strikesRef.current} of ${MAX_STRIKES}. One more and this session ends.\n\nBack to ${topic}:` };
+      const refusal = { role: 'assistant', content: `That looks like an attempt to change my instructions. I'm your tutor for ${topic} — nothing else. This is strike ${strikesRef.current} of ${MAX_STRIKES}. One more and this session ends.\n\nBack to ${topic}:` };
       setMessages(prev => [...prev, blocked, refusal]);
       setInput('');
       return;
@@ -266,6 +291,8 @@ export default function SocraticMode({ onExit, subject }) {
     setError(null);
   }
 
+  const activePersonality = PERSONALITIES.find(p => p.id === (personality || 'socratic'));
+
   // -- Session terminated --
   if (terminated) {
     return (
@@ -280,6 +307,32 @@ export default function SocraticMode({ onExit, subject }) {
           <button className="socratic-exit-btn" onClick={onExit} style={{ fontSize: '1.1rem', padding: '0.75rem 2rem' }}>
             &larr; Back to Menu
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -- Personality picker --
+  if (!personality) {
+    return (
+      <div className="socratic-select">
+        <div className="socratic-select-header">
+          <button className="socratic-exit-btn" onClick={onExit}>&larr; Exit</button>
+          <h1 className="socratic-title">Socratic Mode</h1>
+          <span className="socratic-subtitle">Choose your guide</span>
+        </div>
+        <div className="socratic-personality-grid">
+          {PERSONALITIES.map(p => (
+            <button
+              key={p.id}
+              className="socratic-personality-btn"
+              onClick={() => setPersonality(p.id)}
+            >
+              <span className="socratic-personality-icon">{p.icon}</span>
+              <span className="socratic-personality-label">{p.label}</span>
+              <span className="socratic-personality-desc">{p.desc}</span>
+            </button>
+          ))}
         </div>
       </div>
     );
@@ -328,7 +381,7 @@ export default function SocraticMode({ onExit, subject }) {
         <div className="socratic-select-header">
           <button className="socratic-exit-btn" onClick={onExit}>&larr; Exit</button>
           <h1 className="socratic-title">Socratic Mode</h1>
-          <span className="socratic-subtitle">Pick a topic to explore</span>
+          <span className="socratic-subtitle">{activePersonality.icon} {activePersonality.label} · Pick a topic</span>
         </div>
         <div className="socratic-topic-grid">
           {ALL_TOPICS.map(t => (
@@ -344,6 +397,11 @@ export default function SocraticMode({ onExit, subject }) {
             </button>
           ))}
         </div>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '1rem' }}>
+          <button className="socratic-exit-btn" onClick={() => setPersonality(null)}>
+            ← Change Guide
+          </button>
+        </div>
       </div>
     );
   }
@@ -357,7 +415,7 @@ export default function SocraticMode({ onExit, subject }) {
       <div className="socratic-header" style={{ '--accent': accentColor }}>
         <button className="socratic-exit-btn" onClick={onExit}>&larr; Exit</button>
         <div className="socratic-header-center">
-          <span className="socratic-header-mode">Socratic Mode</span>
+          <span className="socratic-header-mode">{activePersonality.icon} {activePersonality.label}</span>
           <button className="socratic-topic-pill" style={{ background: accentColor }} onClick={handleChangeTopic}>
             {topic} &darr;
           </button>
@@ -382,7 +440,7 @@ export default function SocraticMode({ onExit, subject }) {
         {messages.map((msg, i) => (
           <div key={i} className={`socratic-bubble-wrap ${msg.role}`}>
             {msg.role === 'assistant' && (
-              <div className="socratic-avatar" style={{ background: accentColor }}>S</div>
+              <div className="socratic-avatar" style={{ background: accentColor }}>{activePersonality.avatarLabel}</div>
             )}
             <div className={`socratic-bubble ${msg.role}`} style={msg.role === 'assistant' ? { '--accent': accentColor } : {}}>
               {msg.content}
