@@ -336,15 +336,31 @@ export default async function handler(req, res) {
     };
 
     // Enable Google Search grounding for Socratic mode only
-    if (activeMode === 'socratic') {
+    const useGrounding = activeMode === 'socratic';
+    if (useGrounding) {
       streamConfig.tools = [{ googleSearch: {} }];
     }
 
-    const stream = await client.models.generateContentStream({
-      model: 'gemini-3.1-flash-lite-preview',
-      config: streamConfig,
-      contents,
-    });
+    let stream;
+    try {
+      stream = await client.models.generateContentStream({
+        model: 'gemini-3.1-flash-lite-preview',
+        config: streamConfig,
+        contents,
+      });
+    } catch (groundingErr) {
+      if (useGrounding) {
+        console.warn(`[SOCRATIC] Google Search grounding failed, retrying without: ${groundingErr.message}`);
+        delete streamConfig.tools;
+        stream = await client.models.generateContentStream({
+          model: 'gemini-3.1-flash-lite-preview',
+          config: streamConfig,
+          contents,
+        });
+      } else {
+        throw groundingErr;
+      }
+    }
 
     let groundingMetadata = null;
 
@@ -384,6 +400,7 @@ export default async function handler(req, res) {
     res.write('data: [DONE]\n\n');
     res.end();
   } catch (err) {
+    console.error(`[SOCRATIC ERROR] ${err.message}`, err.stack);
     if (res.headersSent) {
       res.write(`data: ${JSON.stringify({ error: 'Stream interrupted.' })}\n\n`);
       res.end();
