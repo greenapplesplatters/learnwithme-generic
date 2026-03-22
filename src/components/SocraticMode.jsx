@@ -275,7 +275,7 @@ export default function SocraticMode({ onExit, subject }) {
     const updatedHistory = [...messages, userMessage];
     setMessages(updatedHistory);
     setInput('');
-    await askAI(updatedHistory.map(m => ({ role: m.role, content: m.content })), topic);
+    await askAI(updatedHistory.slice(-SESSION_MAX_MESSAGES).map(m => ({ role: m.role, content: m.content })), topic);
   }
 
   function handleKeyDown(e) {
