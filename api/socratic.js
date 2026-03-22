@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
 const MAX_INPUT_LENGTH = 500;
-const MAX_HISTORY_LENGTH = 40;
+const MAX_HISTORY_LENGTH = 80;
 const MAX_BODY_SIZE = 50000;
 const MAX_STRIKES = 2;
 const STRIKE_LOCKOUT_DURATION = 15 * 60 * 1000;
