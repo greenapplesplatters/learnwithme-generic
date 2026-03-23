@@ -89,6 +89,21 @@ function hasSession(t) {
   } catch { return false; }
 }
 
+const CURRICULUM_INDEX_KEY = 'socratic_curriculum_index';
+
+function getCurriculumIndex() {
+  try {
+    const v = localStorage.getItem(CURRICULUM_INDEX_KEY);
+    return v !== null ? parseInt(v, 10) : 0;
+  } catch { return 0; }
+}
+
+function saveCurriculumIndex(i) {
+  try {
+    localStorage.setItem(CURRICULUM_INDEX_KEY, String(i));
+  } catch {}
+}
+
 // Trim history for API: always keep the first message (AI's opening framing) +
 // the most recent messages so context window never exceeds server limit.
 function buildApiHistory(msgs, summary = null) {
@@ -154,6 +169,7 @@ export default function SocraticMode({ onExit, subject }) {
 
   const [personality, setPersonality] = useState(null);
   const [topic, setTopic] = useState(null);
+  const [curriculumIndex, setCurriculumIndex] = useState(0);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
@@ -327,6 +343,16 @@ export default function SocraticMode({ onExit, subject }) {
     setTopic(null);
     setMessages([]);
     setError(null);
+    summaryRef.current = null;
+  }
+
+  function handleNextTopic() {
+    const nextIdx = Math.min(curriculumIndex + 1, ALL_TOPICS.length - 1);
+    saveCurriculumIndex(nextIdx);
+    setCurriculumIndex(nextIdx);
+    setError(null);
+    summaryRef.current = null;
+    setTopic(ALL_TOPICS[nextIdx]);
   }
 
   const activePersonality = PERSONALITIES.find(p => p.id === (personality || 'socratic'));
@@ -364,7 +390,12 @@ export default function SocraticMode({ onExit, subject }) {
             <button
               key={p.id}
               className="socratic-personality-btn"
-              onClick={() => setPersonality(p.id)}
+              onClick={() => {
+                const idx = Math.min(getCurriculumIndex(), Math.max(ALL_TOPICS.length - 1, 0));
+                setCurriculumIndex(idx);
+                setPersonality(p.id);
+                if (ALL_TOPICS.length > 0) setTopic(ALL_TOPICS[idx]);
+              }}
             >
               <span className="socratic-personality-icon">{p.icon}</span>
               <span className="socratic-personality-label">{p.label}</span>
@@ -427,7 +458,11 @@ export default function SocraticMode({ onExit, subject }) {
               key={t}
               className="socratic-topic-btn"
               style={{ '--accent': topicColor(t) }}
-              onClick={() => setTopic(t)}
+              onClick={() => {
+                const idx = ALL_TOPICS.indexOf(t);
+                if (idx !== -1) { saveCurriculumIndex(idx); setCurriculumIndex(idx); }
+                setTopic(t);
+              }}
             >
               <span className="socratic-topic-dot" style={{ background: topicColor(t) }} />
               {t}
@@ -458,7 +493,16 @@ export default function SocraticMode({ onExit, subject }) {
             {topic} &darr;
           </button>
         </div>
-        <div style={{ width: 60 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 60 }}>
+          {ALL_TOPICS.length > 0 && (
+            <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>{curriculumIndex + 1} / {ALL_TOPICS.length}</span>
+          )}
+          {curriculumIndex < ALL_TOPICS.length - 1 && (
+            <button className="socratic-exit-btn" onClick={handleNextTopic} style={{ marginTop: '0.2rem' }}>
+              Next &rarr;
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Messages */}
