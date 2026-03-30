@@ -61,7 +61,7 @@ const ModeSelect = ({ onSelect, subject, onChangeSubject }) => {
           <div className="mode-pair">
             <button className="mode-card mode-card-half socratic-card-btn" onClick={() => onSelect('socratic')}>
               <span className="mode-icon">🏛️</span>
-              <h2>Socratic</h2>
+              <h2>Socratic Method</h2>
               <p>Guided dialogue. Real understanding follows.</p>
               <span className="mode-cta">Begin →</span>
             </button>
